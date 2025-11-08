@@ -23,18 +23,20 @@ parameter WORD_LEN = 32 // độ dài 1 word
     input wire [KEY_LEN-1:0] data_in,
     input wire valid_in,
     output reg [KEY_LEN-1:0] data_out,
-    output reg valid_out,
-    output reg rw_out,
-    output reg Rcon
+    output reg valid_out
+
 );
 
-reg [KEY_LEN-1:0] key_start;
-wire [WORD_LEN-1:0] rotword;
-wire [WORD_LEN-1:0] subword;
-wire [WORD_LEN-1 : 0] Rcon;
-reg [7 : 0] Rcon_firstbytes;
-wire subword_valid_out;
-wire [KEY_LEN-1:0] tempt_key;
+    reg [KEY_LEN-1:0] key_start;
+    reg [KEY_LEN-1:0] key_start_1;
+    wire [WORD_LEN-1:0] rotword;
+    wire [WORD_LEN-1:0] subword;
+    wire [WORD_LEN-1 : 0] Rcon;
+    reg [7 : 0] Rcon_firstbytes;
+    wire subword_valid_out;
+    wire [KEY_LEN-1:0] tempt_key;
+    reg [KEY_LEN-1:0] data_out_1;
+    reg delayed_valid;
 
 //Rcon table
 always @(*) begin
@@ -55,19 +57,24 @@ end
 
 assign Rcon = {Rcon_firstbytes, 24'h000000};
 //----------------------
-
+//---Pipeline để đồng bộ dữ liệu---
+//---subbytes tốn 1 chu kỳ, nên delay 1 chu kỳ để lấy dữ liệu đồng bộ---
 always @(posedge clk or negedge reset) begin
-    if(!reset) begin
-        valid_out <= 1'b0;
-        data_out <= 'b0;
-    end else begin
-        if (valid_in) 
-            key_start <= data_in; //bắt đầu tạo khóa con
-    end
+    if (!reset)
+        key_start_1 <= 'b0;
+    else if (valid_in)
+        key_start_1 <= data_in;
 end
+always @(posedge clk or negedge reset) begin
+    if (!reset)
+        key_start <= 'b0;
+    else if (valid_in)
+        key_start <= key_start_1; // delay 1 chu kỳ
+end
+
 //xử lý word đầu tiên của khóa 128 bit 
 //---Rotword---
-assign rotword = {key_start[7:0], key_start[WORD_LEN-1 : 8]};
+assign rotword = {key_start_1[WORD_LEN-9:0], key_start_1[WORD_LEN-1 : WORD_LEN-8]};
 //---Subword---
 //truyền độ dài word vì chỉ sub 1 word
 SubBytes #(
@@ -80,6 +87,7 @@ SubBytes #(
     .valid_out(subword_valid_out),
     .data_out(subword)
     );
+
 //---Rcon---
 assign tempt_key[KEY_LEN-1 : KEY_LEN-WORD_LEN] = key_start[KEY_LEN-1 : KEY_LEN-WORD_LEN] ^ subword ^ Rcon;
 assign tempt_key[KEY_LEN-WORD_LEN-1 : KEY_LEN-2*WORD_LEN] = key_start[KEY_LEN-WORD_LEN-1 : KEY_LEN-2*WORD_LEN] ^ tempt_key[KEY_LEN-1 : KEY_LEN-WORD_LEN];
@@ -89,13 +97,26 @@ assign tempt_key[WORD_LEN-1 : 0] = key_start[WORD_LEN-1 : 0] ^ tempt_key[KEY_LEN
 //---wait for posedge clk to show data out---
 always @(posedge clk or negedge reset) begin
     if(!reset) begin
+        delayed_valid <= 1'b0;
+        data_out_1 <= 'b0;
+    end else begin
+        if(subword_valid_out) begin
+           data_out_1 <= tempt_key;
+           delayed_valid <= 1'b1;
+        end else begin
+            delayed_valid <= 1'b0;
+        end
+    end
+end
+always @(posedge clk or negedge reset) begin
+    if(!reset) begin
         valid_out <= 1'b0;
         data_out <= 'b0;
     end else begin
-        if(subword_valid_out) begin
-           data_out <= tempt_key;
+        if(delayed_valid) begin
+           data_out <= data_out_1;
         end
-        valid_out <= valid_in;
+        valid_out <= delayed_valid;
     end
 end
 endmodule

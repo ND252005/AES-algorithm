@@ -21,7 +21,7 @@ generate
     for (i = 0; i < NUM_OF_BYTES; i = i + 1) begin : Sbyte
         Sbox Sbyte(
             .clk(clk), 
-            .reset(reset), 
+            .reset(reset),
             .valid_in(valid_in), 
             .data_in(data_in[i*8+7 : i*8]), 
             .data_out(data_out[i*8+7 : i*8])
