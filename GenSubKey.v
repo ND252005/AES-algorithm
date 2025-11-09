@@ -27,6 +27,7 @@ parameter WORD_LEN = 32 // độ dài 1 word
 
 );
 
+    reg valid_first;
     reg [KEY_LEN-1:0] key_start;
     reg [KEY_LEN-1:0] key_start_1;
     wire [WORD_LEN-1:0] rotword;
@@ -39,16 +40,23 @@ parameter WORD_LEN = 32 // độ dài 1 word
 //----------------------
 //---Pipeline để đồng bộ dữ liệu---
 //---subbytes tốn 1 chu kỳ, nên delay 1 chu kỳ để lấy dữ liệu đồng bộ---
+//---tại vòng đầu, gán giá trị để tính rotword và subbyte trước---
+//---vì subbyte phải tốn 1 chu kỳ. khi subbyte vừa có kết quả thì tính tempt là được---
 always @(posedge clk or negedge reset) begin
-    if (!reset)
+    if (!reset) begin
         key_start_1 <= 'b0;
-    else if (valid_in)
+        valid_first <= 1'b0;    
+    end else if (valid_in) begin
         key_start_1 <= data_in;
+    end
+        valid_first <= valid_in;
 end
+//---vòng delay chu kỳ, kiểm tra biến check ở chu kì trước đã set chưa---
+//---nếu rồi thì mới gán giá trị để tính cho tempt---
 always @(posedge clk or negedge reset) begin
     if (!reset)
         key_start <= 'b0;
-    else if (valid_in)
+    else if (valid_first)
         key_start <= key_start_1; // delay 1 chu kỳ
 end
 
@@ -57,12 +65,17 @@ end
 assign rotword = {key_start_1[WORD_LEN-9:0], key_start_1[WORD_LEN-1 : WORD_LEN-8]};
 //---Subword---
 //truyền độ dài word vì chỉ sub 1 word
+//---tín hiệu đầu vào cho subbyte phải là tín hiệu khi tại key_start_1 có dữ liệu
+//---key_start_1 có dữ liệu chỉ khi đã qua một xung clk 
+//---khác với tín hiệu valid_in của khối, mặc dù nó giống nhau 
+//---nhưng tín hiệu valid_in của khối được set ngay khi có có tín hiệu
+//---làm cho subbyte nhầm lẫn khi đó đã có giá trị để tính toán
 SubBytes #(
     .DATA_LEN(WORD_LEN)
     ) sb_gen (
     .clk(clk),
     .reset(reset),
-    .valid_in(valid_in),
+    .valid_in(valid_first),
     .data_in(rotword),
     .valid_out(subword_valid_out),
     .data_out(subword)
@@ -82,10 +95,8 @@ always @(posedge clk or negedge reset) begin
     end else begin
         if(subword_valid_out) begin
            data_out_1 <= tempt_key;
-           delayed_valid <= 1'b1;
-        end else begin
-            delayed_valid <= 1'b0;
         end
+        delayed_valid <= subword_valid_out;
     end
 end
 always @(posedge clk or negedge reset) begin
