@@ -8,6 +8,8 @@ module KeyExpantion_tb;
     reg valid_in;
     wire [(NUMS_OF_ROUND*KEY_LEN-1) : 0] key_array;
     wire [NUMS_OF_ROUND-1 : 0] valid_out;
+    reg  [NUMS_OF_ROUND-1 : 0] prev_valid_out;
+    
 
     KeyExpantion #(
         .KEY_LEN(KEY_LEN),
@@ -23,6 +25,7 @@ module KeyExpantion_tb;
 
     initial begin
         reset = 1;
+        prev_valid_out = 'b0;
         clk = 0;
         forever #5 clk = ~clk;
     end
@@ -35,38 +38,17 @@ module KeyExpantion_tb;
     #10;
     Secret_key = 128'h00112233445566778899AABBCCDDEEFF;
     valid_in = 1;
-
     end
 
-    // initial begin
-    //   $monitor ("Time=%d   |   valid_in=%b   |   current_key_0=%h   |   valid_out=%b",
-    //             $time, valid_in, key_array[KEY_LEN-1 : 0], valid_out[0]);
-    //   $monitor ("Time=%d   |   valid_in=%b   |   current_key_1=%h   |   valid_out=%b",
-    //             $time, valid_in, key_array[2*KEY_LEN-1 : KEY_LEN], valid_out[1]);
-    //   $monitor ("Time=%d   |   valid_in=%b   |   current_key_2=%h   |   valid_out=%b",
-    //             $time, valid_in, key_array[3*KEY_LEN-1 : 2*KEY_LEN], valid_out[2]);
-    //   $monitor ("Time=%d   |   valid_in=%b   |   current_key_3=%h   |   valid_out=%b",
-    //             $time, valid_in, key_array[4*KEY_LEN-1 : 3*KEY_LEN], valid_out[3]);
-    //   $monitor ("Time=%d   |   valid_in=%b   |   current_key_4=%h   |   valid_out=%b",
-    //             $time, valid_in, key_array[5*KEY_LEN-1 : 4*KEY_LEN], valid_out[4]);
-    //   $monitor ("Time=%d   |   valid_in=%b   |   current_key_5=%h   |   valid_out=%b",
-    //             $time, valid_in, key_array[6*KEY_LEN-1 : 5*KEY_LEN], valid_out[5]);
-    //   $monitor ("Time=%d   |   valid_in=%b   |   current_key_6=%h   |   valid_out=%b",
-    //             $time, valid_in, key_array[7*KEY_LEN-1 : 6*KEY_LEN], valid_out[6]);
-    //   $monitor ("Time=%d   |   valid_in=%b   |   current_key_7=%h   |   valid_out=%b",
-    //             $time, valid_in, key_array[8*KEY_LEN-1 : 7*KEY_LEN], valid_out[7]);
-    //   $monitor ("Time=%d   |   valid_in=%b   |   current_key_8=%h   |   valid_out=%b",
-    //             $time, valid_in, key_array[9*KEY_LEN-1 : 8*KEY_LEN], valid_out[8]);
-    //   $monitor ("Time=%d   |   valid_in=%b   |   current_key_9=%h   |   valid_out=%b",
-    //             $time, valid_in, key_array[10*KEY_LEN-1 : 9*KEY_LEN], valid_out[9]);
-    // end
-
+//---Hàm in dữ liệu, khi bắt đầu valid được set lên, chạy tới khi kết thúc
     integer i;
 always @(posedge clk) begin
-    if (valid_out ) begin
+    if (valid_out != prev_valid_out) begin
         $display("---- Time=%0t ----", $time);
-        for (i = 0; i < 10; i = i + 1)
+        for (i = 0; i < 10; i = i + 1) begin
         $display("Round %0d key = %h | valid_out = %b", i, key_array[i*KEY_LEN +: KEY_LEN], valid_out);
+        end
+        prev_valid_out <= valid_out;
     end
 end
 
