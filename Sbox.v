@@ -1,5 +1,5 @@
 
-`timescale 1ps/1ps
+`timescale 1ns/1ps
 module Sbox (clk, reset, valid_in, data_in, data_out);
 input clk;
 input reset;

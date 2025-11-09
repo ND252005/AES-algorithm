@@ -2,7 +2,7 @@
     testbench file for generate subkey
 
 */
-`timescale 1ps/1ps
+`timescale 1ns/1ps
 module GenSubKey_tb;
 
     parameter KEY_LEN = 128;
@@ -10,7 +10,7 @@ module GenSubKey_tb;
 
     reg clk;
     reg reset;
-    reg [3:0] round_n;
+    reg [WORD_LEN-1 : 0] Rcon;
     reg [KEY_LEN-1:0] last_sub_key;
     reg valid_in;
     wire [KEY_LEN-1:0] current_key;
@@ -22,7 +22,7 @@ module GenSubKey_tb;
     ) GSK (
         .clk(clk),
         .reset(reset),
-      	.round_n(round_n),
+      	.Rcon(Rcon),
         .data_in(last_sub_key),
         .valid_in(valid_in),
         .data_out(current_key),
@@ -34,12 +34,11 @@ module GenSubKey_tb;
         forever #5 clk = ~clk;
     end
     initial begin
-      $monitor ("Time=%d   |   round=%h   |   last_sub_key=%h   |   valid_out=%b   |   current_key=%h   |   valid_out=%b",
-                $time, round_n, last_sub_key, valid_in, current_key, valid_out);
+      $monitor ("Time=%d   |   Rcon=%h   |   last_sub_key=%h   |   valid_in=%b   |   current_key=%h   |   valid_out=%b",
+                $time, Rcon, last_sub_key, valid_in, current_key, valid_out);
     end
     initial begin
-      	#5;
-        round_n = 0; last_sub_key = 128'h00112233445566778899AABBCCDDEEFF; valid_in = 1;
+      	#5; Rcon = 32'h01000000; last_sub_key = 128'h00112233445566778899AABBCCDDEEFF; valid_in = 1;
 //         #20;
 //         round_n = 1; last_sub_key = 128'h0F1571C947D9E8590CB7ADD6AF7F6798;
 //         #20;

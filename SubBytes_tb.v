@@ -1,6 +1,6 @@
 // Code your testbench here
 // or browse Examples
-`timescale 1ps/1ps
+`timescale 1ns/1ps
 module SubBytes_tb;
     parameter DATA_LEN = 128;
     reg clk;

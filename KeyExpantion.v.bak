@@ -15,22 +15,22 @@
 
 module KeyExpantion #(
     parameter KEY_LEN = 128,
-    parameter NUMS_OF_ROUND = 10,
-    parameter WORD_LEN = 32
+    parameter NUMS_OF_ROUND = 10
 ) (
     input clk,
     input reset,
     input [KEY_LEN-1 : 0] Secret_key,
     input valid_in,
+    // output [KEY_LEN-1:0] key_arr [0 : NUMS_OF_ROUND],
     output wire [(NUMS_OF_ROUND*KEY_LEN-1) : 0] key_expan,
-    output wire [NUMS_OF_ROUND-1 : 0] valid_out
+    output wire [NUMS_OF_ROUND : 0] valid_out
 );
-    wire [KEY_LEN-1:0] key_arr [0 : NUMS_OF_ROUND];
-    wire [NUMS_OF_ROUND-1:0] subkey_valid_out;
+    reg [KEY_LEN-1:0] key_arr [0 : NUMS_OF_ROUND];
+    reg [NUMS_OF_ROUND-1:0] subkey_valid_out;
 
 
 //---Rcon table---
-wire [WORD_LEN-1:0] Rcon [0:9];
+wire [KEY_LEN-1:0] Rcon [0:9];
 assign Rcon[0] = 32'h01000000;
 assign Rcon[1] = 32'h02000000;
 assign Rcon[2] = 32'h04000000;
@@ -51,22 +51,20 @@ GenSubKey #(
     .data_in(Secret_key),
     .valid_in(valid_in),
     .data_out(key_arr[0]),
-    .valid_out(subkey_valid_out[0])
+    .valid_out(valid_out[0])
 );
 
 genvar i;
 generate
-    for(i = 1; i < NUMS_OF_ROUND; i = i+1) begin : gen_subkeys
-    wire [KEY_LEN-1:0] prev_subkey = key_arr[i-1];
-    wire prev_valid = subkey_valid_out[i-1];
+    for(i = 1; i < NUMS_OF_ROUND; i = i+1) begin : GSK_inst
     GenSubKey #(
     .KEY_LEN(KEY_LEN)
     ) GSK_inst (
     .clk(clk),
     .reset(reset),
     .Rcon(Rcon[i]),
-    .data_in(prev_subkey),
-    .valid_in(prev_valid),
+    .data_in(key_arr[i-1]),
+    .valid_in(subkey_valid_out[i-1]),
     .data_out(key_arr[i]),
     .valid_out(subkey_valid_out[i])
 );
@@ -74,16 +72,16 @@ generate
 endgenerate
 
 assign key_expan = {
-    key_arr[9],
-    key_arr[8],
-    key_arr[7],
-    key_arr[6],
-    key_arr[5],
-    key_arr[4],
-    key_arr[3],
-    key_arr[2],
+    key_arr[0],
     key_arr[1],
-    key_arr[0]
+    key_arr[2],
+    key_arr[3],
+    key_arr[4],
+    key_arr[5],
+    key_arr[6],
+    key_arr[7],
+    key_arr[8],
+    key_arr[9]
     };
 assign valid_out = subkey_valid_out;
     

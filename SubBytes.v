@@ -1,7 +1,7 @@
 /*
 Hàm thay thế từng bytes trong 128 bit, 1 phần của aes 
 */
-`timescale 1ps/1ps
+`timescale 1ns/1ps
 
 module SubBytes #(
     parameter DATA_LEN = 128,

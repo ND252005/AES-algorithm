@@ -12,14 +12,14 @@ output:
 - signal_out
 
 */
-`timescale 1ps/1ps
+`timescale 1ns/1ps
 module GenSubKey #(
 parameter KEY_LEN = 128, // độ dài khóa
 parameter WORD_LEN = 32 // độ dài 1 word 
 ) (
     input wire clk,
     input wire reset,
-    input wire [3:0] round_n,
+    input wire [WORD_LEN-1:0] Rcon,
     input wire [KEY_LEN-1:0] data_in,
     input wire valid_in,
     output reg [KEY_LEN-1:0] data_out,
@@ -31,31 +31,11 @@ parameter WORD_LEN = 32 // độ dài 1 word
     reg [KEY_LEN-1:0] key_start_1;
     wire [WORD_LEN-1:0] rotword;
     wire [WORD_LEN-1:0] subword;
-    wire [WORD_LEN-1 : 0] Rcon;
-    reg [7 : 0] Rcon_firstbytes;
     wire subword_valid_out;
     wire [KEY_LEN-1:0] tempt_key;
     reg [KEY_LEN-1:0] data_out_1;
     reg delayed_valid;
 
-//Rcon table
-always @(*) begin
-    case (round_n)
-    4'd0: Rcon_firstbytes = 8'h01;
-    4'd1: Rcon_firstbytes = 8'h02;
-    4'd2: Rcon_firstbytes = 8'h04;
-    4'd3: Rcon_firstbytes = 8'h08;
-    4'd4: Rcon_firstbytes = 8'h10;
-    4'd5: Rcon_firstbytes = 8'h20;
-    4'd6: Rcon_firstbytes = 8'h40;
-    4'd7: Rcon_firstbytes = 8'h80;
-    4'd8: Rcon_firstbytes = 8'h1B;
-    4'd9: Rcon_firstbytes = 8'h36;
-        default: Rcon_firstbytes = 8'h00;
-    endcase
-end
-
-assign Rcon = {Rcon_firstbytes, 24'h000000};
 //----------------------
 //---Pipeline để đồng bộ dữ liệu---
 //---subbytes tốn 1 chu kỳ, nên delay 1 chu kỳ để lấy dữ liệu đồng bộ---
