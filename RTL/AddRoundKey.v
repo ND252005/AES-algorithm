@@ -20,10 +20,10 @@ always @(posedge clk or negedge reset) begin
         data_out <= 'b0;
         valid_out <= 1'b0;
     end else begin
-        if (data_valid_in && round_key) begin
+        if (data_valid_in && key_valid_in) begin
             data_out <= data_in ^ round_key;
         end
-        valid_out <= 1'b0;
+        valid_out <= data_valid_in & key_valid_in;
     end
 end
 endmodule

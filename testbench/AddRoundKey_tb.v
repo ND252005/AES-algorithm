@@ -1,3 +1,4 @@
+`timescale 1 ns/1 ps
 module AddRoundKey_tb();
 
 parameter DATA_W = 128;
@@ -49,15 +50,15 @@ initial begin
 
     #10;
     //Test1
-    data_in =  128'h0123456789ABCDEF_FEDCBA9876543210;
-    round_key = 128'h0011223344556677_8899AABBCCDDEEFF;
+    data_in =  128'h0123456789ABCDEFFEDCBA9876543210;
+    round_key = 128'h00112233445566778899AABBCCDDEEFF;
     data_valid_in = 1;
     key_valid_in = 1;
 
     #20;
     //Test2
-    data_in = 128'hFFFFFFFFFFFFFFFF_FFFFFFFFFFFFFFFF;
-    round_key = 128'h0000000000000000_0000000000000000;
+    data_in = 128'hFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
+    round_key = 128'h00000000000000000000000000000000;
     data_valid_in = 1;
     key_valid_in = 1;
 

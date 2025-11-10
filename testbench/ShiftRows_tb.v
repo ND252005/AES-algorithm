@@ -1,3 +1,5 @@
+`timescale 1 ns/1 ps
+
 module ShiftRows_tb();
 
 parameter DATA_W = 128;
@@ -38,11 +40,11 @@ initial begin
     reset = 1;
 
     #10;
-    data_in =  128'h0123456789ABCDEF_FEDCBA9876543210;
+    data_in =  128'h0123456789ABCDEFFEDCBA9876543210;
     valid_in = 1;
 
     #20;
-     data_in =  128'h0011223344556677_8899AABBCCDDEEFF;
+     data_in =  128'h00112233445566778899AABBCCDDEEFF;
     valid_in = 1;
 
     #20;
