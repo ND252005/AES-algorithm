@@ -1,6 +1,6 @@
 // module name: MixColums 
 
-module 
+module MixColums
      #(
     parameter DATA_W = 128
 ) (
