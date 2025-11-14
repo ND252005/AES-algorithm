@@ -2,18 +2,18 @@
 
 module ShiftRows_tb();
 
-parameter DATA_W = 128;
+parameter DATA_LEN = 128;
 
 //Tín hiệu
 reg clk;
 reg reset;
 reg valid_in;
-reg [DATA_W-1:0] data_in;
+reg [DATA_LEN-1 : 0] data_in;
 wire valid_out;
-wire [DATA_W-1:0] data_out;
+wire [DATA_LEN-1 : 0] data_out;
 
 ShiftRows #(
-    .DATA_W(DATA_W)
+    .DATA_LEN(DATA_LEN)
 ) test (
     .clk(clk),
     .reset(reset),

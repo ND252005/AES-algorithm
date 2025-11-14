@@ -10,7 +10,9 @@ module SubBytes_tb;
     reg [DATA_LEN-1 : 0] data_in;
     wire [DATA_LEN-1 : 0] data_out;
 
-    SubBytes #(.DATA_LEN(DATA_LEN)) Sb (
+    SubBytes #(
+        .DATA_LEN(DATA_LEN)
+        ) Sb (
             .clk(clk), 
             .reset(reset), 
             .valid_in(valid_in), 

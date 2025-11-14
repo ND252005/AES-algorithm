@@ -3,16 +3,16 @@
 `timescale 1 ns/1 ps
 
 module AddRoundKey #(
-    parameter DATA_W = 128
+    parameter DATA_LEN = 128
 ) (
     input clk,
     input reset,
     input data_valid_in,
     input key_valid_in,
-    input [DATA_W-1:0] data_in,
-    input [DATA_W-1:0] round_key,
+    input [DATA_LEN-1:0] data_in,
+    input [DATA_LEN-1:0] round_key,
     output reg valid_out,
-    output reg [DATA_W-1:0] data_out
+    output reg [DATA_LEN-1:0] data_out
 );
     
 always @(posedge clk or negedge reset) begin

@@ -3,14 +3,14 @@
 `timescale 1 ns/1 ps
 module ShiftRows
  #(
-    parameter DATA_W = 128
+    parameter DATA_LEN = 128
 )(
     input clk,
     input reset,               // tích cực mức thấp
     input valid_in,            // tín hiệu đầu vào hợp lệ
-    input [DATA_W-1:0] data_in,
+    input [DATA_LEN-1:0] data_in,
     output reg valid_out,      // tín hiệu đầu ra hợp lệ
-    output reg [DATA_W-1:0] data_out
+    output reg [DATA_LEN-1:0] data_out
 );
 
 wire [7:0] State [0:15]; // mảng lưu các phần tử của mảng 2 chiều 4x4 với mỗi phần tử 8bits

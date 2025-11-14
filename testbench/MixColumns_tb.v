@@ -16,7 +16,7 @@ module MixColumns_tb ();
     end
 
     MixColumns #(
-        .DATA_W(DATA_LEN)
+        .DATA_LEN(DATA_LEN)
     ) mxcl (
         .clk(clk),
         .reset(reset),
