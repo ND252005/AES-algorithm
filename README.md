@@ -1,2 +1,2 @@
 # AES-algorithm
-AES algorithm by verilog language
+AES encrypt algorithm by verilog HDL language
