@@ -29,6 +29,7 @@ module KeyExpantion_tb;
         clk = 0;
         forever #5 clk = ~clk;
     end
+
     initial begin
     reset = 0;
     valid_in = 0;
