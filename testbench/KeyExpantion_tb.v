@@ -37,7 +37,7 @@ module KeyExpantion_tb;
     #12;
     reset = 1;
     #10;
-    Secret_key = 128'h00112233445566778899AABBCCDDEEFF;
+    Secret_key = 128'h2b7e151628aed2a6abf7158809cf4f3c;
     valid_in = 1;
     end
 
