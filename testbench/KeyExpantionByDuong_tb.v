@@ -1,4 +1,4 @@
-`timescale 1ns/1ps
+`timescale 1 ns/1 ps
 
 module KeyExpantionbyDuong_tb();
 
