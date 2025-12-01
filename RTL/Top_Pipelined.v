@@ -69,7 +69,7 @@ endgenerate
 SubBytes #(DATA_W) U_SUB (
     .clk(clk),
     .reset(reset),
-    .data_valid_in(valid_round_data[NO_ROUNDS-1]),
+    .valid_in(valid_round_data[NO_ROUNDS-1]),
     .data_in(data_round[NO_ROUNDS-1]),
     .valid_out(valid_sub_to_shift),
     .data_out(data_sub_to_shift)
@@ -77,7 +77,7 @@ SubBytes #(DATA_W) U_SUB (
 ShiftRows #(DATA_W) U_SH (
     .clk(clk),
     .reset(reset),
-    .data_valid_in(valid_sub_to_shift),
+    .valid_in(valid_sub_to_shift),
     .data_in(data_sub_to_shift),
     .valid_out(valid_shift_to_key),
     .data_out(data_shift_to_key)
