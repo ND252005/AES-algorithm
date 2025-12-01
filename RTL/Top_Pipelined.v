@@ -10,10 +10,10 @@ module Top_Pipelined #(
     input reset,
     input data_valid_in,
     input key_valid_in,
-    input [KEY_LEN-1:0] cipher_key,
+    input [KEY_LEN-1:0] cipher_key,  // khóa chính
     input [DATA_W-1:0] plain_text,  // dữ liệu đầu vào 
     output valid_out,
-    output [DATA_W-1:0] cipher_text // khóa chính
+    output [DATA_W-1:0] cipher_text // dữ liệu sau khi mã hóa
 );
 
 wire [NO_ROUNDS-1:0] valid_round_key;           //tín hiệu valid của tất cả khóa vòng từ KeyExpantion
