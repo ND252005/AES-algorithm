@@ -84,7 +84,7 @@ SubWord sw_gen (
     );
 
 //---Rcon---
-assign tempt_key[KEY_LEN-1 : KEY_LEN-WORD_LEN] = (opcode) ? (subword) : (key_start[KEY_LEN-1 : KEY_LEN-WORD_LEN] ^ subword ^ Rcon);
+assign tempt_key[KEY_LEN-1 : KEY_LEN-WORD_LEN] = (opcode) ? (subword ^ key_start[KEY_LEN-1 : KEY_LEN-WORD_LEN]) : (key_start[KEY_LEN-1 : KEY_LEN-WORD_LEN] ^ subword ^ Rcon);
 assign tempt_key[KEY_LEN-WORD_LEN-1 : KEY_LEN-2*WORD_LEN] = key_start[KEY_LEN-WORD_LEN-1 : KEY_LEN-2*WORD_LEN] ^ tempt_key[KEY_LEN-1 : KEY_LEN-WORD_LEN];
 assign tempt_key[KEY_LEN-2*WORD_LEN-1 : KEY_LEN-3*WORD_LEN] = key_start [KEY_LEN-2*WORD_LEN-1 : KEY_LEN-3*WORD_LEN] ^ tempt_key[KEY_LEN-WORD_LEN-1 : KEY_LEN-2*WORD_LEN];
 assign tempt_key[WORD_LEN-1 : 0] = key_start[WORD_LEN-1 : 0] ^ tempt_key[KEY_LEN-2*WORD_LEN-1 : KEY_LEN-3*WORD_LEN] ;

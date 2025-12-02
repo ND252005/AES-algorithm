@@ -1,8 +1,8 @@
 `timescale 1ns/1ps
 module TOP_tb ();
-    parameter KEY_LEN = 128;
+    parameter KEY_LEN = 256;
     parameter DATA_LEN = 128;
-    parameter NUMS_OF_ROUND = 10;
+    parameter NUMS_OF_ROUND = 14;
 
     reg clk, reset; 
     reg data_valid_in;
