@@ -10,6 +10,7 @@ module GenSubKey_tb;
 
     reg clk;
     reg reset;
+    reg opcode;
     reg [WORD_LEN-1 : 0] Rcon;
     reg [KEY_LEN-1:0] last_sub_key;
     reg valid_in;
@@ -22,6 +23,7 @@ module GenSubKey_tb;
     ) GSK (
         .clk(clk),
         .reset(reset),
+        .opcode(opcode),
       	.Rcon(Rcon),
         .data_in(last_sub_key),
         .valid_in(valid_in),
@@ -34,18 +36,14 @@ module GenSubKey_tb;
         forever #5 clk = ~clk;
     end
     initial begin
-      $monitor ("Time=%d   |   Rcon=%h   |   last_sub_key=%h   |   valid_in=%b   |   current_key=%h   |   valid_out=%b",
-                $time, Rcon, last_sub_key, valid_in, current_key, valid_out);
+      $monitor ("Time=%d   |   Rcon=%h   |   last_sub_key=%h   |   valid_in=%b   |   current_key=%h   |   valid_out=%b| opcode=%b",
+                $time, Rcon, last_sub_key, valid_in, current_key, valid_out, opcode);
     end
     initial begin
-      	#5; Rcon = 32'h01000000; last_sub_key = 128'h2b7e151628aed2a6abf7158809cf4f3c; valid_in = 1;
-//         #20;
-//         round_n = 1; last_sub_key = 128'h0F1571C947D9E8590CB7ADD6AF7F6798;
-//         #20;
-//         round_n = 1; last_sub_key = 128'hA1B2C3D4E5F60718293A4B5C6D7E8F90; 
-//         #15;
-//         round_n = 1; last_sub_key = 128'h2B7E151628AED2A6ABF7158809CF4F3C; 
-        #30; valid_in = 0;
+      	// #5; Rcon = 32'h01000000; last_sub_key = 128'h2b7e151628aed2a6abf7158809cf4f3c; valid_in = 1; opcode = 0;
+        // #40; valid_in = 0;valid_out=0;
+        #5; Rcon = 32'h01000000; last_sub_key = 128'h2b7e151628aed2a6abf7158809cf4f3c; valid_in = 1; opcode = 0;
+        #40;valid_in = 0;
         #30;
         $finish;
     end

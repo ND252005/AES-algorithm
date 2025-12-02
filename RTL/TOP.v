@@ -1,8 +1,8 @@
 `timescale 1ns/1ps
 module TOP #(
-    parameter KEY_LEN = 128,
+    parameter KEY_LEN = 256,
     parameter DATA_LEN = 128,
-    parameter NUMS_OF_ROUND = 10
+    parameter NUMS_OF_ROUND = 14
 ) (
     input clk, //Clock và reset của hệ thống
     input reset,
@@ -30,18 +30,7 @@ module TOP #(
     reg[DATA_LEN-1:0] data_shift2key_delayed;           //for delay register
     reg valid_shift2key_delayed;
 
-    KeyExpantion #(
-        .KEY_LEN(KEY_LEN),
-        .NUMS_OF_ROUND(NUMS_OF_ROUND)
-    ) KeyExpantion_inst (
-        .clk(clk),
-        .reset(reset),
-        .valid_in(key_valid_in),
-        .Secret_key(cipher_key),
-        .key_expan(key_array),
-        .valid_out(subkey_valid)
-    );
-
+  
     AddRoundKey #(
         .DATA_LEN(DATA_LEN)
     ) AddRoundKey_inst (
@@ -50,9 +39,20 @@ module TOP #(
         .data_valid_in(data_valid_in),
         .data_in(plain_text),
         .key_valid_in(key_valid_in),
-        .round_key(cipher_key),
+        .round_key(cipher_key[127:0]),
         .valid_out(round_valid[0]),
         .data_out(round_data[0])
+    );
+  KeyExpantion #(
+        .KEY_LEN(KEY_LEN),
+        .NUMS_OF_ROUND(NUMS_OF_ROUND)
+    ) KeyExpantion_inst (
+        .clk(clk),
+        .reset(reset),
+        .valid_in(round_valid[0]),
+        .Secret_key(cipher_key[KEY_LEN-1 : 128]),
+        .key_expan(key_array),
+        .valid_out(subkey_valid)
     );
 
 // ----------------------------------------------------------------
@@ -180,6 +180,64 @@ module TOP #(
         .valid_out(round_valid[9]),
         .data_out(round_data[9])
     );
+
+    // ----------------------------------------------------------------
+    // ROUND 10
+    // ----------------------------------------------------------------
+    Round #( .DATA_LEN(DATA_LEN) ) Round_10 (
+        .clk(clk),
+        .reset(reset),
+        .data_valid_in(round_valid[9]),
+        .data_in(round_data[9]),
+        .key_valid_in(subkey_valid[9]),
+        .sub_key(key_array[10*KEY_LEN-1 : 9*KEY_LEN]),
+        .valid_out(round_valid[10]),
+        .data_out(round_data[10])
+    );
+
+
+    // ----------------------------------------------------------------
+    // ROUND 11
+    // ----------------------------------------------------------------
+    Round #( .DATA_LEN(DATA_LEN) ) Round_11 (
+        .clk(clk),
+        .reset(reset),
+        .data_valid_in(round_valid[10]),
+        .data_in(round_data[10]),
+        .key_valid_in(subkey_valid[10]),
+        .sub_key(key_array[11*KEY_LEN-1 : 10*KEY_LEN]),
+        .valid_out(round_valid[11]),
+        .data_out(round_data[11])
+    );
+
+    // ----------------------------------------------------------------
+    // ROUND 12
+    // ----------------------------------------------------------------
+    Round #( .DATA_LEN(DATA_LEN) ) Round_12 (
+        .clk(clk),
+        .reset(reset),
+        .data_valid_in(round_valid[11]),
+        .data_in(round_data[11]),
+        .key_valid_in(subkey_valid[11]),
+        .sub_key(key_array[12*KEY_LEN-1 : 11*KEY_LEN]),
+        .valid_out(round_valid[12]),
+        .data_out(round_data[12])
+    );
+
+    // ----------------------------------------------------------------
+    // ROUND 13
+    // ----------------------------------------------------------------
+    Round #( .DATA_LEN(DATA_LEN) ) Round_13 (
+        .clk(clk),
+        .reset(reset),
+        .data_valid_in(round_valid[12]),
+        .data_in(round_data[12]),
+        .key_valid_in(subkey_valid[12]),
+        .sub_key(key_array[13*KEY_LEN-1 : 12*KEY_LEN]),
+        .valid_out(round_valid[13]),
+        .data_out(round_data[13])
+    );
+
 
 // -----Last round: SubBytes ()-----
     SubBytes #(

@@ -19,6 +19,7 @@ parameter WORD_LEN = 32 // độ dài 1 word
 ) (
     input wire clk,
     input wire reset,
+    input wire opcode, //opcode = 1: chỉ cần subword, opcode = 0: cần rotword + subword;
     input wire [WORD_LEN-1:0] Rcon,
     input wire [KEY_LEN-1:0] data_in,
     input wire valid_in,
@@ -26,10 +27,11 @@ parameter WORD_LEN = 32 // độ dài 1 word
     output reg valid_out
 
 );
-
+    
     reg valid_first;
     reg [KEY_LEN-1:0] key_start;
     reg [KEY_LEN-1:0] key_start_1;
+    wire [WORD_LEN-1:0] sub_word_data_in;
     wire [WORD_LEN-1:0] rotword;
     wire [WORD_LEN-1:0] subword;
     wire subword_valid_out;
@@ -61,8 +63,10 @@ always @(posedge clk or negedge reset) begin
 end
 
 //xử lý word đầu tiên của khóa 128 bit 
-//---Rotword---
-assign rotword = {key_start_1[WORD_LEN-9:0], key_start_1[WORD_LEN-1 : WORD_LEN-8]};
+//---Rotword--- sẽ check bit opcode để quyết định đầu vào cho khối Subwword vì một số trường hợp không cần subword
+assign rotword =  {key_start_1[WORD_LEN-9:0], key_start_1[WORD_LEN-1 : WORD_LEN-8]};
+assign sub_word_data_in = (opcode) ? key_start_1 : rotword;
+
 //---Subword---
 //truyền độ dài word vì chỉ sub 1 word
 //---tín hiệu đầu vào cho subbyte phải là tín hiệu khi tại key_start_1 có dữ liệu
@@ -74,13 +78,13 @@ SubWord sw_gen (
     .clk(clk),
     .reset(reset),
     .valid_in(valid_first),
-    .data_in(rotword),
+    .data_in(sub_word_data_in),
     .valid_out(subword_valid_out),
     .data_out(subword)
     );
 
 //---Rcon---
-assign tempt_key[KEY_LEN-1 : KEY_LEN-WORD_LEN] = key_start[KEY_LEN-1 : KEY_LEN-WORD_LEN] ^ subword ^ Rcon;
+assign tempt_key[KEY_LEN-1 : KEY_LEN-WORD_LEN] = (opcode) ? (subword) : (key_start[KEY_LEN-1 : KEY_LEN-WORD_LEN] ^ subword ^ Rcon);
 assign tempt_key[KEY_LEN-WORD_LEN-1 : KEY_LEN-2*WORD_LEN] = key_start[KEY_LEN-WORD_LEN-1 : KEY_LEN-2*WORD_LEN] ^ tempt_key[KEY_LEN-1 : KEY_LEN-WORD_LEN];
 assign tempt_key[KEY_LEN-2*WORD_LEN-1 : KEY_LEN-3*WORD_LEN] = key_start [KEY_LEN-2*WORD_LEN-1 : KEY_LEN-3*WORD_LEN] ^ tempt_key[KEY_LEN-WORD_LEN-1 : KEY_LEN-2*WORD_LEN];
 assign tempt_key[WORD_LEN-1 : 0] = key_start[WORD_LEN-1 : 0] ^ tempt_key[KEY_LEN-2*WORD_LEN-1 : KEY_LEN-3*WORD_LEN] ;
@@ -93,7 +97,7 @@ always @(posedge clk or negedge reset) begin
     end else begin
         if(subword_valid_out) begin
            data_out_1 <= tempt_key;
-        end
+        end 
         delayed_valid <= subword_valid_out;
     end
 end

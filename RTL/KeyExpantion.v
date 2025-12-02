@@ -14,8 +14,8 @@
 `timescale 1ns/1ps
 
 module KeyExpantion #(
-    parameter KEY_LEN = 128,
-    parameter NUMS_OF_ROUND = 10,
+    parameter KEY_LEN = 256,
+    parameter NUMS_OF_ROUND = 14,
     parameter WORD_LEN = 32
 ) (
     input clk,
@@ -38,21 +38,38 @@ assign Rcon[3] = 32'h08000000;
 assign Rcon[4] = 32'h10000000;
 assign Rcon[5] = 32'h20000000;
 assign Rcon[6] = 32'h40000000;
-assign Rcon[7] = 32'h80000000;
-assign Rcon[8] = 32'h1B000000;
-assign Rcon[9] = 32'h36000000;
+// assign Rcon[7] = 32'h80000000;
+// assign Rcon[8] = 32'h1B000000;
+// assign Rcon[9] = 32'h36000000;
 
 GenSubKey #(
     .KEY_LEN(KEY_LEN)
     ) FGSK (
     .clk(clk),
     .reset(reset),
+    
     .Rcon(Rcon[0]),
     .data_in(Secret_key),
+    .opcode(0)
     .valid_in(valid_in),
     .data_out(key_arr[0]),
     .valid_out(subkey_valid_out[0])
 );
+
+GenSubKey #(
+    .KEY_LEN(KEY_LEN)
+    ) FGSK (
+    .clk(clk),
+    .reset(reset),
+    
+    .Rcon(Rcon[0]),
+    .data_in(Secret_key),
+    .opcode(1),
+    .valid_in(valid_in),
+    .data_out(key_arr[0]),
+    .valid_out(subkey_valid_out[0])
+);
+
 
 // Giả sử key_arr[0] đã chứa khóa gốc (Original Key)
     // subkey_valid_out[0] đã chứa tín hiệu valid gốc
