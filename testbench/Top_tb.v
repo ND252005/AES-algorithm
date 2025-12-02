@@ -1,42 +1,56 @@
-`timescale 1 ns/1 ps
+`timescale 1ns/1ps
 
 module Top_tb;
 
-parameter DATA_W = 128;
-parameter KEY_LEN = 128;
+parameter DATA_W   = 128;
+parameter KEY_LEN  = 128;
 parameter NO_ROUNDS = 10;
 
-// DUT signals
-reg input clk;
+// =====================
+// DUT INPUTS
+// =====================
+reg clk;
 reg reset;
 reg data_valid_in;
 reg key_valid_in;
-input [KEY_LEN-1:0] cipher_key;
-input [DATA_W-1:0] plain_text;
+reg [KEY_LEN-1:0] cipher_key;
+reg [DATA_W-1:0] plain_text;
 
-
+// =====================
+// DUT OUTPUTS
+// =====================
 wire valid_out;
-wire [DATA_W-1:0] cirpher_text;
+wire [DATA_W-1:0] cipher_text;
 
-Top_Pipelined #(DATA_W, KEY_LEN, NO_ROUNDS) DUT (
+// =====================
+// Instantiate DUT
+// =====================
+Top_Pipelined #(
+    .DATA_W(DATA_W),
+    .KEY_LEN(KEY_LEN),
+    .NO_ROUNDS(NO_ROUNDS)
+) DUT (
     .clk(clk),
     .reset(reset),
     .data_valid_in(data_valid_in),
-    .key_valid_in(key_valid_in),
+    .cipherkey_valid_in(key_valid_in),
     .cipher_key(cipher_key),
-    .plain_text(),
+    .plain_text(plain_text),
     .valid_out(valid_out),
     .cipher_text(cipher_text)
 );
 
-
-// Clock generation
+// =====================
+// Clock Generator
+// =====================
 initial begin
     clk = 0;
-    forever #5 clk = ~clk; // 10 ns clock period    
+    forever #5 clk = ~clk;     // Clock 10ns
 end
 
-// Test sequence
+// =====================
+// TEST STIMULUS
+// =====================
 initial begin
     $display("===== AES PIPELINED TOP TESTBENCH START =====");
     
