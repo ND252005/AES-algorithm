@@ -70,9 +70,7 @@ assign rotword = {key_start_1[WORD_LEN-9:0], key_start_1[WORD_LEN-1 : WORD_LEN-8
 //---khác với tín hiệu valid_in của khối, mặc dù nó giống nhau 
 //---nhưng tín hiệu valid_in của khối được set ngay khi có có tín hiệu
 //---làm cho subbyte nhầm lẫn khi đó đã có giá trị để tính toán
-SubBytes #(
-    .DATA_LEN(WORD_LEN)
-    ) sb_gen (
+SubWord sw_gen (
     .clk(clk),
     .reset(reset),
     .valid_in(valid_first),

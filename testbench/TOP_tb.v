@@ -52,7 +52,7 @@ module TOP_tb ();
         key_valid_in = 0;
 
         // ---- Test vector (có thể thay đổi) ----
-        cipher_key = 128'h000102030405060708090A0B0C0D0E0F;
+        cipher_key = 128'h00000000000000000000000000000000;
         plain_text = 128'hf34481ec3cc627bacd5dc3fb08f273e6;
         
         #10; 

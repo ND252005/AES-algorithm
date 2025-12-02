@@ -55,23 +55,131 @@ module TOP #(
         .data_out(round_data[0])
     );
 
-    genvar i;
-generate
-      for(i = 1; i <= NUMS_OF_ROUND-1; i = i+1) begin : ROUND
-        Round #(
-            .DATA_LEN(DATA_LEN)
-        ) ROUND_inst (
-            .clk(clk),
-            .reset(reset),
-            .data_valid_in(round_valid[i-1]),
-            .data_in(round_data[i-1]),
-            .key_valid_in(subkey_valid[i-1]),
-            .sub_key(key_array[(i*KEY_LEN-1) : ((i-1)*KEY_LEN)]),
-            .valid_out(round_valid[i]),
-            .data_out(round_data[i])
-        );
-    end 
-endgenerate
+// ----------------------------------------------------------------
+    // ROUND 1
+    // ----------------------------------------------------------------
+    Round #( .DATA_LEN(DATA_LEN) ) Round_1 (
+        .clk(clk),
+        .reset(reset),
+        .data_valid_in(round_valid[0]),
+        .data_in(round_data[0]),
+        .key_valid_in(subkey_valid[0]),
+        .sub_key(key_array[1*KEY_LEN-1 : 0*KEY_LEN]),
+        .valid_out(round_valid[1]),
+        .data_out(round_data[1])
+    );
+
+    // ----------------------------------------------------------------
+    // ROUND 2
+    // ----------------------------------------------------------------
+    Round #( .DATA_LEN(DATA_LEN) ) Round_2 (
+        .clk(clk),
+        .reset(reset),
+        .data_valid_in(round_valid[1]),
+        .data_in(round_data[1]),
+        .key_valid_in(subkey_valid[1]),
+        .sub_key(key_array[2*KEY_LEN-1 : 1*KEY_LEN]),
+        .valid_out(round_valid[2]),
+        .data_out(round_data[2])
+    );
+
+    // ----------------------------------------------------------------
+    // ROUND 3
+    // ----------------------------------------------------------------
+    Round #( .DATA_LEN(DATA_LEN) ) Round_3 (
+        .clk(clk),
+        .reset(reset),
+        .data_valid_in(round_valid[2]),
+        .data_in(round_data[2]),
+        .key_valid_in(subkey_valid[2]),
+        .sub_key(key_array[3*KEY_LEN-1 : 2*KEY_LEN]),
+        .valid_out(round_valid[3]),
+        .data_out(round_data[3])
+    );
+
+    // ----------------------------------------------------------------
+    // ROUND 4
+    // ----------------------------------------------------------------
+    Round #( .DATA_LEN(DATA_LEN) ) Round_4 (
+        .clk(clk),
+        .reset(reset),
+        .data_valid_in(round_valid[3]),
+        .data_in(round_data[3]),
+        .key_valid_in(subkey_valid[3]),
+        .sub_key(key_array[4*KEY_LEN-1 : 3*KEY_LEN]),
+        .valid_out(round_valid[4]),
+        .data_out(round_data[4])
+    );
+
+    // ----------------------------------------------------------------
+    // ROUND 5
+    // ----------------------------------------------------------------
+    Round #( .DATA_LEN(DATA_LEN) ) Round_5 (
+        .clk(clk),
+        .reset(reset),
+        .data_valid_in(round_valid[4]),
+        .data_in(round_data[4]),
+        .key_valid_in(subkey_valid[4]),
+        .sub_key(key_array[5*KEY_LEN-1 : 4*KEY_LEN]),
+        .valid_out(round_valid[5]),
+        .data_out(round_data[5])
+    );
+
+    // ----------------------------------------------------------------
+    // ROUND 6
+    // ----------------------------------------------------------------
+    Round #( .DATA_LEN(DATA_LEN) ) Round_6 (
+        .clk(clk),
+        .reset(reset),
+        .data_valid_in(round_valid[5]),
+        .data_in(round_data[5]),
+        .key_valid_in(subkey_valid[5]),
+        .sub_key(key_array[6*KEY_LEN-1 : 5*KEY_LEN]),
+        .valid_out(round_valid[6]),
+        .data_out(round_data[6])
+    );
+
+    // ----------------------------------------------------------------
+    // ROUND 7
+    // ----------------------------------------------------------------
+    Round #( .DATA_LEN(DATA_LEN) ) Round_7 (
+        .clk(clk),
+        .reset(reset),
+        .data_valid_in(round_valid[6]),
+        .data_in(round_data[6]),
+        .key_valid_in(subkey_valid[6]),
+        .sub_key(key_array[7*KEY_LEN-1 : 6*KEY_LEN]),
+        .valid_out(round_valid[7]),
+        .data_out(round_data[7])
+    );
+
+    // ----------------------------------------------------------------
+    // ROUND 8
+    // ----------------------------------------------------------------
+    Round #( .DATA_LEN(DATA_LEN) ) Round_8 (
+        .clk(clk),
+        .reset(reset),
+        .data_valid_in(round_valid[7]),
+        .data_in(round_data[7]),
+        .key_valid_in(subkey_valid[7]),
+        .sub_key(key_array[8*KEY_LEN-1 : 7*KEY_LEN]),
+        .valid_out(round_valid[8]),
+        .data_out(round_data[8])
+    );
+
+    // ----------------------------------------------------------------
+    // ROUND 9
+    // ----------------------------------------------------------------
+    Round #( .DATA_LEN(DATA_LEN) ) Round_9 (
+        .clk(clk),
+        .reset(reset),
+        .data_valid_in(round_valid[8]),
+        .data_in(round_data[8]),
+        .key_valid_in(subkey_valid[8]),
+        .sub_key(key_array[9*KEY_LEN-1 : 8*KEY_LEN]),
+        .valid_out(round_valid[9]),
+        .data_out(round_data[9])
+    );
 
 // -----Last round: SubBytes ()-----
     SubBytes #(
