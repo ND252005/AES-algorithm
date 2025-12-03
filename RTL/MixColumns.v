@@ -22,11 +22,11 @@ module MixColumns #(
 // 03 01 01 02
 
 // Khai báo hằng số đa thức AES (x^8 + x^4 + x^3 + x + 1)
+    // Kiểm tra bit cao nhất (MSB), nếu = 1 thì Dịch trái XOR 1B, ngược lại chỉ dịch trái
     // ----------------------------------------------------------------------
     // BYTE 0 (Tương ứng i=0)
     // ----------------------------------------------------------------------
     assign state[0]    = data_in[127:120];
-    // Kiểm tra bit cao nhất (MSB), nếu = 1 thì Dịch trái XOR 1B, ngược lại chỉ dịch trái
     assign state_x2[0] = (state[0][7]) ? ((state[0] << 1) ^ mx) : (state[0] << 1);
     assign state_x3[0] = state_x2[0] ^ state[0];
 

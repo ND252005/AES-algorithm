@@ -1,5 +1,4 @@
 // module name: AddRoundKey
-
 `timescale 1 ns/1 ps
 
 module AddRoundKey #(
@@ -14,7 +13,7 @@ module AddRoundKey #(
     output reg valid_out,
     output reg [DATA_LEN-1:0] data_out
 );
-    
+
 always @(posedge clk or negedge reset) begin
     if (!reset) begin
         data_out <= 'b0;

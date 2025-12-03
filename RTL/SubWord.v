@@ -2,7 +2,7 @@
 
 module SubWord #(
     parameter DATA_LEN = 32,
-    parameter NUM_OF_BYTES = 4 // số lượng byte cần thay thế number_of_bytes = DATA_LEN/8
+    parameter NUM_OF_BYTES = 4 // Chỉ định số byte cần thay thế cho 1 word
 ) (
     input clk,
     input reset,
