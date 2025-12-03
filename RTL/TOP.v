@@ -4,30 +4,31 @@ module TOP #(
     parameter DATA_LEN = 128,
     parameter NUMS_OF_ROUND = 10
 ) (
-    input clk,                                      //Clock và reset của hệ thống
+    input clk,                                          //Clock và reset của hệ thống
     input reset,
-    input data_valid_in,                            // biến kiểm tra dữ liệu đầu vào có hay chưa
-    input [DATA_LEN-1 : 0] plain_text,              // dữ liệu cần mã hóa
-    input key_valid_in,                             //biến kiểm ra khóa đầu vào có hay chưa
-    input [KEY_LEN-1 : 0] cipher_key,               // khóa đầu vào
-    output wire data_valid_out,                     // biến kiểm tra dữ liệu đầu ra có hay chưa
-    output wire [DATA_LEN-1 : 0] cipher_text        // dữ liệu sau khi mã hóa
+    input data_valid_in,                                // biến kiểm tra dữ liệu đầu vào có hay chưa
+    input [DATA_LEN-1 : 0] plain_text,                  // dữ liệu cần mã hóa
+    input key_valid_in,                                 //biến kiểm ra khóa đầu vào có hay chưa
+    input [KEY_LEN-1 : 0] cipher_key,                   // khóa đầu vào
+    output wire data_valid_out,                         // biến kiểm tra dữ liệu đầu ra có hay chưa
+    output wire [DATA_LEN-1 : 0] cipher_text            // dữ liệu sau khi mã hóa
 );
-    wire [NUMS_OF_ROUND-1 : 0] subkey_valid;        // biến kiểm tra khóa con của từng vòng có hay chưa
-    wire [(NUMS_OF_ROUND*KEY_LEN-1) : 0] key_array; //  mảng khóa con của tất cả các vòng
-    wire [NUMS_OF_ROUND-1 : 0] round_valid;         // biến kiểm tra dữ liệu đầu ra của từng vòng có hay chưa
+    wire [NUMS_OF_ROUND-1 : 0] subkey_valid;            // biến kiểm tra khóa con của từng vòng có hay chưa
+    wire [(NUMS_OF_ROUND*KEY_LEN-1) : 0] key_array;     //  mảng khóa con của tất cả các vòng
+    wire [NUMS_OF_ROUND-1 : 0] round_valid;             // biến kiểm tra dữ liệu đầu ra của từng vòng có hay chưa
     wire [DATA_LEN-1 : 0] round_data [0 : NUMS_OF_ROUND-1]; // dữ liệu đầu ra của từng vòng
 
     // khai báo dây cho vòng cuối cùng
-    wire [DATA_LEN-1 : 0] data_sub2shift;           // dữ liệu đầu ra của SubByte() là đầu vào của ShiftRows()
+    wire [DATA_LEN-1 : 0] data_sub2shift;               // dữ liệu đầu ra của SubByte() là đầu vào của ShiftRows()
 
-    wire valid_sub2shift;                           // tín hiệu đầu ra của SubByte() là đầu vào của ShiftRows()
-    wire addrk_valid_in;                            // tín hiệu đầu ra của MixColums() là đầu vào của AddRoundKey()
+    wire valid_sub2shift;                               // tín hiệu đầu ra của SubByte() là đầu vào của ShiftRows()
+    wire addrk_valid_in;                                // tín hiệu đầu ra của MixColums() là đầu vào của AddRoundKey()
 
     //delay cho vòng cuối để pipeline cho mixcolunms
-    wire[DATA_LEN-1:0] data_shift2key;
+    wire[DATA_LEN-1:0] data_shift2key;                  //dành cho delay thanh ghi
     wire valid_shift2key;
-    reg[DATA_LEN-1:0] data_shift2key_delayed;
+    reg[DATA_LEN-1:0] data_shift2key_delayed;           //dành cho delay thanh ghi
+    reg valid_shift2key_delayed;
 
 //Mở rộng khóa cho các vòng
     KeyExpantion #(
