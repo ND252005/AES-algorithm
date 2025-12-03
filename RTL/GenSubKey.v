@@ -23,7 +23,7 @@ parameter WORD_LEN = 32 // độ dài 1 word
     reg [KEY_LEN-1:0] data_out_1;
     reg delayed_valid;
 
-
+//--------------------FIRST STAGES--------------------
 always @(posedge clk or negedge reset) begin
     if (!reset) begin
         key_start_1 <= 'b0;
@@ -35,6 +35,7 @@ always @(posedge clk or negedge reset) begin
 end
 //---vòng delay chu kỳ, kiểm tra biến check ở chu kì trước đã set chưa---
 //---nếu rồi thì mới gán giá trị để tính cho tempt---
+//--------------------SECOND STAGES--------------------
 always @(posedge clk or negedge reset) begin
     if (!reset)
         key_start <= 'b0;
@@ -62,6 +63,7 @@ assign tempt_key[KEY_LEN-2*WORD_LEN-1 : KEY_LEN-3*WORD_LEN] = key_start [KEY_LEN
 assign tempt_key[WORD_LEN-1 : 0] = key_start[WORD_LEN-1 : 0] ^ tempt_key[KEY_LEN-2*WORD_LEN-1 : KEY_LEN-3*WORD_LEN] ;
 
 //---wait for posedge clk to show data out---
+//--------------------THIRD STAGES--------------------
 always @(posedge clk or negedge reset) begin
     if(!reset) begin
         delayed_valid <= 1'b0;
@@ -73,6 +75,7 @@ always @(posedge clk or negedge reset) begin
         delayed_valid <= subword_valid_out;
     end
 end
+//--------------------FOURTH STAGES--------------------
 always @(posedge clk or negedge reset) begin
     if(!reset) begin
         valid_out <= 1'b0;

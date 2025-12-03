@@ -6,12 +6,12 @@ module KeyExpantion #(
     parameter NUMS_OF_ROUND = 10,                           //Số vòng lăp
     parameter WORD_LEN = 32                                 //độ dài 1 word
 ) (
-    input clk,
-    input reset,
-    input [KEY_LEN-1 : 0] Secret_key,
-    input valid_in,
-    output wire [(NUMS_OF_ROUND*KEY_LEN-1) : 0] key_expan,
-    output wire [NUMS_OF_ROUND-1 : 0] valid_out
+    input clk,                                              //tín hiệu clk, reset của hệ thống
+    input reset,                                
+    input [KEY_LEN-1 : 0] Secret_key,                       //khóa mã hóa
+    input valid_in,                                         //giá trị hợp lệ đầu vào để bắt đầu tạo khóa
+    output wire [(NUMS_OF_ROUND*KEY_LEN-1) : 0] key_expan,  //khóa lớn lưu tất cả các khóa con
+    output wire [NUMS_OF_ROUND-1 : 0] valid_out             //giá trị hợp lệ của từng khóa
 );
     wire [KEY_LEN-1:0] key_arr [0 : NUMS_OF_ROUND];
     wire [NUMS_OF_ROUND-1:0] subkey_valid_out;

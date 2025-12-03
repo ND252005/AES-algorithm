@@ -1,7 +1,3 @@
-/*
-    testbench file for generate subkey
-
-*/
 `timescale 1ns/1ps
 module GenSubKey_tb;
 

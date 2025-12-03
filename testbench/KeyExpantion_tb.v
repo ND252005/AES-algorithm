@@ -54,14 +54,3 @@ always @(posedge clk) begin
 end
 
 endmodule
-// # ---- Time=495000 ----
-// # Round 0 key = c0393478846c520f0cf5f8b4c028164b
-// # Round 1 key = f67e87c27212d5cd7ee72d79becf3b32
-// # Round 2 key = 789ca46c0a8e71a174695cd8caa667ea
-// # Round 3 key = 541923185e9752b92afe0e61e058698b
-// # Round 4 key = 2ee01ef970774c405a894221bad12baa
-// # Round 5 key = 3011b20d4066fe4d1aefbc6ca03e97c6
-// # Round 6 key = c29906ed82fff8a0981044cc382ed30a
-// # Round 7 key = 73ff61eaf100994a6910dd86513e0e8c
-// # Round 8 key = da54053b2b549c71424441f7137a4f7b
-// # Round 9 key = 36d024461d84b8375fc0f9c04cbab6bb

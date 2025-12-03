@@ -5,14 +5,14 @@ module MixColumns #(
 ) (
     input clk,
     input reset,
-    input valid_in, //tín hiệu bắt đầu
-    input [DATA_LEN-1:0] data_in, //dữ liệu đầu vào 
-    output reg valid_out, //tín hiệu khi có dư liệu đầu ra
-    output reg [DATA_LEN-1:0] data_out //dữ liệu đầu ra
+    input valid_in,                         //tín hiệu bắt đầu
+    input [DATA_LEN-1:0] data_in,           //dữ liệu đầu vào 
+    output reg valid_out,                   //tín hiệu khi có dư liệu đầu ra
+    output reg [DATA_LEN-1:0] data_out      //dữ liệu đầu ra
 );
-    wire [7 : 0] state [0 : 15]; //state sau khi nhân với 01, không thay đổi 
-    wire [7 : 0] state_x2 [0 : 15]; //state sau khi nhân với 02 
-    wire [7 : 0] state_x3 [0 : 15]; //state sau khi nhân với 03 
+    wire [7 : 0] state [0 : 15];            //state sau khi nhân với 01, không thay đổi 
+    wire [7 : 0] state_x2 [0 : 15];         //state sau khi nhân với 02 
+    wire [7 : 0] state_x3 [0 : 15];         //state sau khi nhân với 03 
     wire [7 : 0] mx = 8'h1b; 
 
 // nhân mảng trạng thái với ma trận
