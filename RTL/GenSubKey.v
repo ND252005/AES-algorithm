@@ -1,17 +1,3 @@
-/*
-parameter:
-- KEY_LEN (128, 192, 256)
-- WORD_LEN (32)
-đầu vào: 
-- Vòng thứ ... (0-10 or 12 or 14)
-- khóa vòng trước data_in
-- signal_in
-- clk, reset của hệ thống
-output:
-- khoá trả về
-- signal_out
-
-*/
 `timescale 1ns/1ps
 module GenSubKey #(
 parameter KEY_LEN = 128, // độ dài khóa
@@ -37,11 +23,7 @@ parameter WORD_LEN = 32 // độ dài 1 word
     reg [KEY_LEN-1:0] data_out_1;
     reg delayed_valid;
 
-//----------------------
-//---Pipeline để đồng bộ dữ liệu---
-//---subbytes tốn 1 chu kỳ, nên delay 1 chu kỳ để lấy dữ liệu đồng bộ---
-//---tại vòng đầu, gán giá trị để tính rotword và subbyte trước---
-//---vì subbyte phải tốn 1 chu kỳ. khi subbyte vừa có kết quả thì tính tempt là được---
+
 always @(posedge clk or negedge reset) begin
     if (!reset) begin
         key_start_1 <= 'b0;
@@ -63,13 +45,7 @@ end
 //xử lý word đầu tiên của khóa 128 bit 
 //---Rotword---
 assign rotword = {key_start_1[WORD_LEN-9:0], key_start_1[WORD_LEN-1 : WORD_LEN-8]};
-//---Subword---
-//truyền độ dài word vì chỉ sub 1 word
-//---tín hiệu đầu vào cho subbyte phải là tín hiệu khi tại key_start_1 có dữ liệu
-//---key_start_1 có dữ liệu chỉ khi đã qua một xung clk 
-//---khác với tín hiệu valid_in của khối, mặc dù nó giống nhau 
-//---nhưng tín hiệu valid_in của khối được set ngay khi có có tín hiệu
-//---làm cho subbyte nhầm lẫn khi đó đã có giá trị để tính toán
+
 SubWord sw_gen (
     .clk(clk),
     .reset(reset),
