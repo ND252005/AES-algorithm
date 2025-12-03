@@ -1,7 +1,3 @@
-/*
-    testbench file for generate subkey
-
-*/
 `timescale 1ns/1ps
 module GenSubKey_tb;
 
@@ -38,7 +34,7 @@ module GenSubKey_tb;
                 $time, Rcon, last_sub_key, valid_in, current_key, valid_out);
     end
     initial begin
-      	#5; Rcon = 32'h01000000; last_sub_key = 128'h00112233445566778899AABBCCDDEEFF; valid_in = 1;
+      	#5; Rcon = 32'h01000000; last_sub_key = 128'h2b7e151628aed2a6abf7158809cf4f3c; valid_in = 1;
 //         #20;
 //         round_n = 1; last_sub_key = 128'h0F1571C947D9E8590CB7ADD6AF7F6798;
 //         #20;

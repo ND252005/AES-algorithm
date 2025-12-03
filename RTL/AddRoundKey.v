@@ -1,20 +1,19 @@
 // module name: AddRoundKey
-
 `timescale 1 ns/1 ps
 
 module AddRoundKey #(
     parameter DATA_LEN = 128
 ) (
-    input clk,
+    input clk,                          //clk, reset của hệ thống
     input reset,
-    input data_valid_in,
-    input key_valid_in,
-    input [DATA_LEN-1:0] data_in,
-    input [DATA_LEN-1:0] round_key,
+    input data_valid_in,                //giá trị hợp lệ cho dữ liệu đầu vào
+    input key_valid_in,                 //giá trị hợp lệ cho khóa đầu vào
+    input [DATA_LEN-1:0] data_in,       //dữ liệu đầu vào
+    input [DATA_LEN-1:0] round_key,     //khóa đầu vào
     output reg valid_out,
     output reg [DATA_LEN-1:0] data_out
 );
-    
+
 always @(posedge clk or negedge reset) begin
     if (!reset) begin
         data_out <= 'b0;

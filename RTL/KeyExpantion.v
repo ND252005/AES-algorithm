@@ -1,29 +1,17 @@
-/*
-Đầu vào: 
-- clk:
-- reset:
-- độ dài khóa
-- độ dài từ
-- 
-- flag_in:
-Đầu ra:
-- 
-- 
-*/
 
 `timescale 1ns/1ps
 
 module KeyExpantion #(
-    parameter KEY_LEN = 128,
-    parameter NUMS_OF_ROUND = 10,
-    parameter WORD_LEN = 32
+    parameter KEY_LEN = 128,                                //Độ dài khóa
+    parameter NUMS_OF_ROUND = 10,                           //Số vòng lăp
+    parameter WORD_LEN = 32                                 //độ dài 1 word
 ) (
-    input clk,
-    input reset,
-    input [KEY_LEN-1 : 0] Secret_key,
-    input valid_in,
-    output wire [(NUMS_OF_ROUND*KEY_LEN-1) : 0] key_expan,
-    output wire [NUMS_OF_ROUND-1 : 0] valid_out
+    input clk,                                              //tín hiệu clk, reset của hệ thống
+    input reset,                                
+    input [KEY_LEN-1 : 0] Secret_key,                       //khóa mã hóa
+    input valid_in,                                         //giá trị hợp lệ đầu vào để bắt đầu tạo khóa
+    output wire [(NUMS_OF_ROUND*KEY_LEN-1) : 0] key_expan,  //khóa lớn lưu tất cả các khóa con
+    output wire [NUMS_OF_ROUND-1 : 0] valid_out             //giá trị hợp lệ của từng khóa
 );
     wire [KEY_LEN-1:0] key_arr [0 : NUMS_OF_ROUND];
     wire [NUMS_OF_ROUND-1:0] subkey_valid_out;
@@ -42,9 +30,13 @@ assign Rcon[7] = 32'h80000000;
 assign Rcon[8] = 32'h1B000000;
 assign Rcon[9] = 32'h36000000;
 
+
+// ----------------------------------------------------------------
+// Round 1: Rcon = 01
+// ----------------------------------------------------------------
 GenSubKey #(
     .KEY_LEN(KEY_LEN)
-    ) FGSK (
+    ) GSK_1 (
     .clk(clk),
     .reset(reset),
     .Rcon(Rcon[0]),
@@ -54,24 +46,123 @@ GenSubKey #(
     .valid_out(subkey_valid_out[0])
 );
 
-genvar i;
-generate
-    for(i = 1; i < NUMS_OF_ROUND; i = i+1) begin : gen_subkeys
-    wire [KEY_LEN-1:0] prev_subkey = key_arr[i-1];
-    wire prev_valid = subkey_valid_out[i-1];
-    GenSubKey #(
-    .KEY_LEN(KEY_LEN)
-    ) GSK_inst (
+// ----------------------------------------------------------------
+// Round 2: Rcon = 02
+// ----------------------------------------------------------------
+GenSubKey #(.KEY_LEN(KEY_LEN)) GSK_2 (
     .clk(clk),
     .reset(reset),
-    .Rcon(Rcon[i]),
-    .data_in(prev_subkey),
-    .valid_in(prev_valid),
-    .data_out(key_arr[i]),
-    .valid_out(subkey_valid_out[i])
+    .Rcon(Rcon[1]),
+    .data_in(key_arr[0]),
+    .valid_in(subkey_valid_out[0]),
+    .data_out(key_arr[1]),
+    .valid_out(subkey_valid_out[1])
 );
-    end
-endgenerate
+
+// ----------------------------------------------------------------
+// Round 3: Rcon = 04
+// ----------------------------------------------------------------
+GenSubKey #(.KEY_LEN(KEY_LEN)) GSK_3 (
+    .clk(clk),
+    .reset(reset),
+    .Rcon(Rcon[2]),
+    .data_in(key_arr[1]),
+    .valid_in(subkey_valid_out[1]),
+    .data_out(key_arr[2]),
+    .valid_out(subkey_valid_out[2])
+);
+
+// ----------------------------------------------------------------
+// Round 4: Rcon = 08
+// ----------------------------------------------------------------
+GenSubKey #(.KEY_LEN(KEY_LEN)) GSK_4 (
+    .clk(clk),
+    .reset(reset),
+    .Rcon(Rcon[3]),
+    .data_in(key_arr[2]),
+    .valid_in(subkey_valid_out[2]),
+    .data_out(key_arr[3]),
+    .valid_out(subkey_valid_out[3])
+);
+
+// ----------------------------------------------------------------
+// Round 5: Rcon = 10
+// ----------------------------------------------------------------
+GenSubKey #(.KEY_LEN(KEY_LEN)) GSK_5 (
+    .clk(clk),
+    .reset(reset),
+    .Rcon(Rcon[4]),
+    .data_in(key_arr[3]),
+    .valid_in(subkey_valid_out[3]),
+    .data_out(key_arr[4]),
+    .valid_out(subkey_valid_out[4])
+);
+
+// ----------------------------------------------------------------
+// Round 6: Rcon = 20
+// ----------------------------------------------------------------
+GenSubKey #(.KEY_LEN(KEY_LEN)) GSK_6 (
+    .clk(clk),
+    .reset(reset),
+    .Rcon(Rcon[5]),
+    .data_in(key_arr[4]),
+    .valid_in(subkey_valid_out[4]),
+    .data_out(key_arr[5]),
+    .valid_out(subkey_valid_out[5])
+);
+
+// ----------------------------------------------------------------
+// Round 7: Rcon = 40
+// ----------------------------------------------------------------
+GenSubKey #(.KEY_LEN(KEY_LEN)) GSK_7 (
+    .clk(clk),
+    .reset(reset),
+    .Rcon(Rcon[6]),
+    .data_in(key_arr[5]),
+    .valid_in(subkey_valid_out[5]),
+    .data_out(key_arr[6]),
+    .valid_out(subkey_valid_out[6])
+);
+
+// ----------------------------------------------------------------
+// Round 8: Rcon = 80
+// ----------------------------------------------------------------
+GenSubKey #(.KEY_LEN(KEY_LEN)) GSK_8 (
+    .clk(clk),
+    .reset(reset),
+    .Rcon(Rcon[7]),
+    .data_in(key_arr[6]),
+    .valid_in(subkey_valid_out[6]),
+    .data_out(key_arr[7]),
+    .valid_out(subkey_valid_out[7])
+);
+
+// ----------------------------------------------------------------
+// Round 9: Rcon = 1B
+// ----------------------------------------------------------------
+GenSubKey #(.KEY_LEN(KEY_LEN)) GSK_9 (
+    .clk(clk),
+    .reset(reset),
+    .Rcon(Rcon[8]),
+    .data_in(key_arr[7]),
+    .valid_in(subkey_valid_out[7]),
+    .data_out(key_arr[8]),
+    .valid_out(subkey_valid_out[8])
+);
+
+// ----------------------------------------------------------------
+// Round 10: Rcon = 36
+// ----------------------------------------------------------------
+GenSubKey #(.KEY_LEN(KEY_LEN)) GSK_10 (
+    .clk(clk),
+    .reset(reset),
+    .Rcon(Rcon[9]),
+    .data_in(key_arr[8]),
+    .valid_in(subkey_valid_out[8]),
+    .data_out(key_arr[9]),
+    .valid_out(subkey_valid_out[9])
+);
+
 
 assign key_expan = {
     key_arr[9],
