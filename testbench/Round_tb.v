@@ -45,12 +45,14 @@ initial begin
 
     #10;
     data_in    = 128'h00112233445566778899AABBCCDDEEFF;
-    round_key  = 128'h000102030405060708090A0B0C0D0E0F;
-
     data_valid_in = 1;
-    key_valid_in  = 1;
     #10;
     data_valid_in = 0;
+    #25;
+    round_key  = 128'h000102030405060708090A0B0C0D0E0F;
+    key_valid_in  = 1;
+
+    #10;
     key_valid_in  = 0;
 
     repeat(20) @(posedge clk);
