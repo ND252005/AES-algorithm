@@ -16,6 +16,7 @@ module TOP_tb ();
     wire data_valid_out;
     wire [DATA_LEN-1 : 0] cipher_text;
 
+    // Instantiate DUT
     TOP #(
         .KEY_LEN(KEY_LEN),
         .DATA_LEN(DATA_LEN),
@@ -31,75 +32,78 @@ module TOP_tb ();
         .cipher_text(cipher_text)
     );
 
+    // --- 1. Clock Generation ---
     initial begin
         clk = 0;
         forever #(CLK_PERIOD/2) clk = ~clk;
     end
 
-    task drive_test(
-        input [127:0] plain_text_, 
-        input [127:0] cipher_key_
-    );
-        begin
-            @(posedge clk);
-            plain_text    = plain_text_;
-            cipher_key    = cipher_key_;
-            data_valid_in = 1'b1;
-            key_valid_in  = 1'b1;
-            
-            $display("----------------------------------------------------------");
-            $display("[Time %0t] INPUT  | Plain: %h | Key: %h", $time, plain_text_, cipher_key_);
-    
-            // Giữ tín hiệu valid trong 1 chu kỳ clock (Pulse)
-            @(posedge clk);
-            data_valid_in = 1'b0;
-            key_valid_in  = 1'b0;
-
-            //chờ data valid out lên 1
-            wait(data_valid_out == 1'b1);
-            
-            #1;
-            $display("[Time %0t] OUTPUT | Cipher: %h", $time, cipher_text);
-
- 
-            @(posedge clk);
-            #10;            
-        end
-    endtask
-
+    // --- 2. Monitor Block (Quan trọng cho Pipeline) ---
+    // Khối này chạy song song, luôn rình xem có kết quả đầu ra không
+    // Nó không chặn việc gửi dữ liệu đầu vào.
     initial begin
-        // --- Khởi tạo ban đầu ---
-        reset = 0;       // Đang Reset (Active Low: 0 là Reset)
+        forever begin
+            @(posedge clk);
+            if (data_valid_out) begin
+                $display("[Time %0t] OUTPUT RECEIVED | Cipher: %h", $time, cipher_text);
+            end
+        end
+    end
+
+    // --- 3. Input Driver (Gửi dữ liệu) ---
+    initial begin
+        // A. Khởi tạo
+        reset = 0;       // Giả sử Reset Active Low (Mức 0 là reset)
         data_valid_in = 0;
         key_valid_in  = 0;
         plain_text = 0;
         cipher_key = 0;
 
-        // Reset hệ thống
+        // B. Reset hệ thống
         #(CLK_PERIOD * 5);
-        reset = 1;
+        reset = 1;       // Thả Reset
         $display("[Time %0t] System Reset Released...", $time);
         #(CLK_PERIOD * 2);
 
-        // ==========================================
-        // ==============TEST CASE 1=================
-        // ==========================================
-        drive_test(
-            128'h00112233445566778899aabbccddeeff,
-            128'h000102030405060708090a0b0c0d0e0f
-        );
+        // C. Bắt đầu nạp Pipeline (Gửi liên tiếp không chờ đợi)
+        $display("--- BAT DAU NAP PIPELINE ---");
 
-        // ==========================================
-        // ==============TEST CASE 2=================
-        // ==========================================
-        drive_test(
-            128'h3243f6a8885a308d313198a2e0370734,
-            128'h2b7e151628aed2a6abf7158809cf4f3c
-        );
+        // --- Gói tin 1 (Cycle T) ---
+        @(posedge clk); // Đợi cạnh lên clock
+        data_valid_in <= 1;
+        key_valid_in  <= 1;
+        plain_text    <= 128'h00112233445566778899aabbccddeeff;
+        cipher_key    <= 128'h000102030405060708090a0b0c0d0e0f;
+        $display("[Time %0t] Sent Packet 1", $time);
 
-        // Kết thúc mô phỏng
-        #100;
-        $display("----------------------------------------------------------");
+        // --- Gói tin 2 (Cycle T+1) ---
+        // Nạp ngay lập tức ở chu kỳ tiếp theo
+        @(posedge clk); 
+        data_valid_in <= 1;
+        key_valid_in  <= 1;
+        plain_text    <= 128'h3243f6a8885a308d313198a2e0370734;
+        cipher_key    <= 128'h2b7e151628aed2a6abf7158809cf4f3c;
+        $display("[Time %0t] Sent Packet 2 (Pipeline)", $time);
+
+        // --- Gói tin 3 (Cycle T+2 - Optional) ---
+        @(posedge clk); 
+        data_valid_in <= 1;
+        key_valid_in  <= 1;
+        plain_text    <= 128'h00000000000000000000000000000000;
+        cipher_key    <= 128'h00000000000000000000000000000000;
+        $display("[Time %0t] Sent Packet 3 (Pipeline)", $time);
+
+        // --- Dừng gửi ---
+        @(posedge clk);
+        data_valid_in <= 0;
+        key_valid_in  <= 0;
+        plain_text    <= 0;
+        cipher_key    <= 0;
+        $display("--- NGUNG NAP, CHO KET QUA ---");
+
+        // D. Chờ đủ lâu để Pipeline xả hết dữ liệu ra
+        #(CLK_PERIOD * 150); 
+        
         $display("All tests finished.");
         $stop;
     end
